@@ -36,7 +36,7 @@ export function findQuestion(
  * with the given `id`.
  */
 export function removeQuestion(questions: Question[], id: number): Question[] {
-    return [];
+    return questions.filter((q) => q.id !== id);
 }
 
 /***
@@ -44,23 +44,25 @@ export function removeQuestion(questions: Question[], id: number): Question[] {
  * questions, as an array.
  */
 export function getNames(questions: Question[]): string[] {
-    return [];
+    return questions.map((q) => q.name);
 }
 
 /***
  * Consumes an array of questions and returns the sum total of all their points added together.
  */
 export function sumPoints(questions: Question[]): number {
-    return 0;
+    return questions.reduce((acc, q) => acc + q.points, 0);
 }
 
 /***
  * Consumes an array of questions and returns the sum total of the PUBLISHED questions.
  */
 export function sumPublishedPoints(questions: Question[]): number {
-    return 0;
+    return questions.reduce(
+        (acc, q) => (q.published ? acc + q.points : acc),
+        0,
+    );
 }
-
 /***
  * Consumes an array of questions, and produces a Comma-Separated Value (CSV) string representation.
  * A CSV is a type of file frequently used to share tabular data; we will use a single string
