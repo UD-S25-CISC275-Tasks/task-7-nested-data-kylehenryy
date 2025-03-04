@@ -126,13 +126,15 @@ export function sameType(questions: Question[]): boolean {
  * except that a blank question has been added onto the end. Reuse the `makeBlankQuestion`
  * you defined in the `objects.ts` file.
  */
+import { makeBlankQuestion } from "./objects";
 export function addNewQuestion(
     questions: Question[],
     id: number,
     name: string,
     type: QuestionType,
 ): Question[] {
-    return [];
+    const newQuestion = makeBlankQuestion(id, name, type);
+    return [...questions, newQuestion];
 }
 
 /***
@@ -145,7 +147,9 @@ export function renameQuestionById(
     targetId: number,
     newName: string,
 ): Question[] {
-    return [];
+    return questions.map((q) =>
+        q.id === targetId ? { ...q, name: newName } : q,
+    );
 }
 
 /***
@@ -160,7 +164,15 @@ export function changeQuestionTypeById(
     targetId: number,
     newQuestionType: QuestionType,
 ): Question[] {
-    return [];
+    return questions.map((q) => {
+        if (q.id !== targetId) {
+            return q;
+        }
+        if (newQuestionType !== "multiple_choice_question") {
+            return { ...q, type: newQuestionType, options: [] };
+        }
+        return { ...q, type: newQuestionType };
+    });
 }
 
 /**
@@ -179,7 +191,22 @@ export function editOption(
     targetOptionIndex: number,
     newOption: string,
 ): Question[] {
-    return [];
+    return questions.map((q) => {
+        if (q.id !== targetId) {
+            return q;
+        }
+
+        let updatedOptions = [...q.options];
+        if (targetOptionIndex === -1) {
+            updatedOptions = [...updatedOptions, newOption];
+        } else {
+            updatedOptions = updatedOptions.map((opt, i) =>
+                i === targetOptionIndex ? newOption : opt,
+            );
+        }
+
+        return { ...q, options: updatedOptions };
+    });
 }
 
 /***
@@ -188,10 +215,23 @@ export function editOption(
  * the duplicate inserted directly after the original question. Use the `duplicateQuestion`
  * function you defined previously; the `newId` is the parameter to use for the duplicate's ID.
  */
+import { duplicateQuestion } from "./objects"; // assumed helper
+
 export function duplicateQuestionInArray(
     questions: Question[],
     targetId: number,
     newId: number,
 ): Question[] {
-    return [];
+    const index = questions.findIndex((q) => q.id === targetId);
+
+    if (index === -1) {
+        return [...questions];
+    }
+
+    const original = questions[index];
+    const duplicated = duplicateQuestion(newId, original);
+
+    const newArray = [...questions];
+    newArray.splice(index + 1, 0, duplicated);
+    return newArray;
 }
